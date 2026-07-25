@@ -78,12 +78,14 @@
     max-width:100%;max-height:100%;width:auto;height:auto;
     opacity:0;transition:opacity 1.6s ease}
   .slide.show{opacity:1}
+  /* with images: photo hugs the top, leftover space falls below it */
+  #session.withimg .slide{top:0;transform:translateX(-50%)}
 
   #ring{position:relative;width:min(46vmin,260px);height:min(46vmin,260px);
     display:flex;align-items:center;justify-content:center}
-  /* with images, the timer floats over the photo so the image keeps the full screen */
+  /* the timer sits in the empty space under the photo (top set by script) */
   #session.withimg #ring{
-    position:absolute;bottom:98px;left:50%;transform:translateX(-50%);
+    position:absolute;top:auto;left:50%;transform:translateX(-50%);
     width:104px;height:104px;margin:0;
     background:rgba(16,20,34,.5);border-radius:50%;backdrop-filter:blur(8px);
   }
@@ -130,7 +132,7 @@
   <header>
     <h1>STILL</h1>
     <p>Your files stay on this device — nothing is uploaded.</p>
-    <p style="font-size:.72rem;opacity:.45;margin-top:4px">v9</p>
+    <p style="font-size:.72rem;opacity:.45;margin-top:4px">v10</p>
   </header>
 
   <div class="card">
@@ -240,6 +242,7 @@
 
   <div id="controls">
     <button id="pauseBtn" type="button">Pause</button>
+    <button id="timerBtn" type="button">Hide timer</button>
     <button id="fsBtn" type="button">Fullscreen</button>
     <button id="stopBtn" type="button">End session</button>
   </div>
@@ -429,6 +432,7 @@ $('beginBtn').addEventListener('click',async()=>{
   sess.classList.add('active');
   sess.classList.toggle('withimg',S.type!=='sound');
   sess.classList.toggle('hidetimer',$('hideTimer').checked);
+  $('timerBtn').textContent=$('hideTimer').checked?'Show timer':'Hide timer';
   $('done').classList.remove('show');
 
   const C=2*Math.PI*46;
@@ -656,10 +660,36 @@ function bell(){
 function showImage(i){
   S.imgIndex=i;
   const inS=S.bgFlip?$('bgA'):$('bgB'), outS=S.bgFlip?$('bgB'):$('bgA');
+  inS.onload=layoutRing;
   inS.src=images[i];
   inS.classList.add('show'); outS.classList.remove('show');
   S.bgFlip=!S.bgFlip;
+  layoutRing();
 }
+
+/* place the timer in the empty space directly beneath the displayed photo */
+function layoutRing(){
+  const sess=$('session'), ring=$('ring'), stage=$('stage');
+  if(!sess.classList.contains('withimg')||sess.classList.contains('hidetimer')) return;
+  const vis=$('bgA').classList.contains('show')?$('bgA'):$('bgB');
+  if(!vis.naturalWidth) return;
+  const sW=stage.clientWidth, sH=stage.clientHeight;
+  const shownH=Math.min(sH, sW*vis.naturalHeight/vis.naturalWidth);   // top-aligned height
+  const ringH=ring.offsetHeight||104;
+  const maxTop=sH-ringH-92;                    // stay clear of the buttons
+  ring.style.top=Math.max(8,Math.min(shownH+14,maxTop))+'px';
+}
+window.addEventListener('resize',layoutRing);
+document.addEventListener('fullscreenchange',()=>setTimeout(layoutRing,60));
+
+/* show / hide the timer mid-session */
+$('timerBtn').addEventListener('click',()=>{
+  const sess=$('session');
+  const hidden=sess.classList.toggle('hidetimer');
+  $('timerBtn').textContent=hidden?'Show timer':'Hide timer';
+  if(!hidden) layoutRing();
+  armIdleHide();
+});
 function startImgTimer(){   // timed rotation in Sound+images mode
   clearTimeout(imgTimer);
   imgTimer=setTimeout(function tick(){
@@ -672,10 +702,11 @@ function startImgTimer(){   // timed rotation in Sound+images mode
 /* ---------- clock / ring / idle ---------- */
 function startUiTick(){
   S.segmentStart=performance.now();
+  $('clock').textContent=fmt(S.target);      // show full time immediately
   clearInterval(uiTimer);
   uiTimer=setInterval(()=>{
     const e=elapsed();
-    $('clock').textContent=fmt(e);
+    $('clock').textContent=fmt(Math.max(0,S.target-e));   // counts down to zero
     const C=2*Math.PI*46;
     $('progC').style.strokeDashoffset=C*(1-Math.min(1,e/S.target));
     if(S.running&&!S.paused&&S.type==='images'&&S.mode==='time'&&e>=S.totalSec) finish();
