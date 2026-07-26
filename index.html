@@ -53,6 +53,7 @@
   .thumbs img{width:58px;height:58px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
   .hint{font-size:.82rem;color:var(--moon-dim);margin-top:10px}
 
+  input[type=range]{width:100%;accent-color:var(--dusk);height:28px;cursor:pointer}
   .check{display:flex;align-items:center;gap:10px;margin-top:14px;cursor:pointer;
     font-size:.95rem;color:var(--moon-dim)}
   .check input{width:17px;height:17px;accent-color:var(--dusk);cursor:pointer}
@@ -63,6 +64,31 @@
   #beginBtn:disabled{opacity:.35;cursor:not-allowed}
   #beginBtn:not(:disabled):hover{opacity:.9}
   #err{color:#e0a3a3;font-size:.9rem;text-align:center;margin-top:12px;min-height:1.3em}
+
+
+  /* ---------- stats ---------- */
+  .statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:4px}
+  .stat{background:var(--ink-3);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .stat b{display:block;font-family:Georgia,serif;font-size:1.5rem;font-weight:400;color:var(--moon)}
+  .stat span{font-size:.74rem;color:var(--moon-dim);letter-spacing:.06em;text-transform:uppercase}
+  .chart{display:flex;align-items:flex-end;gap:4px;height:80px;margin-top:18px}
+  .chart div{flex:1;background:var(--dusk-soft);border-radius:3px 3px 0 0;min-height:2px;position:relative}
+  .chart div.has{background:var(--dusk)}
+  .chartlabels{display:flex;gap:4px;margin-top:5px}
+  .chartlabels span{flex:1;text-align:center;font-size:.6rem;color:var(--moon-dim)}
+  .sesslist{margin-top:16px;border-top:1px solid var(--line)}
+  .sessrow{display:flex;justify-content:space-between;gap:10px;padding:9px 2px;
+    border-bottom:1px solid var(--line);font-size:.85rem}
+  .sessrow span:first-child{color:var(--moon)}
+  .sessrow span:last-child{color:var(--moon-dim);text-align:right;white-space:nowrap}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .btnrow button{flex:1 1 120px;background:var(--ink-3);color:var(--moon);
+    border:1px solid var(--line);border-radius:9px;padding:11px 10px;
+    font-size:.88rem;font-family:inherit;cursor:pointer}
+  .btnrow button:hover{border-color:var(--dusk)}
+  .btnrow button.danger:hover{border-color:#c98b8b;color:#e0a3a3}
+  #statMsg{font-size:.82rem;color:var(--dusk);margin-top:10px;min-height:1.2em}
+  #emptyStats{color:var(--moon-dim);font-size:.9rem}
 
   /* ---------- SESSION ---------- */
   #session{display:none;position:fixed;inset:0;background:var(--ink);
@@ -78,17 +104,27 @@
     max-width:100%;max-height:100%;width:auto;height:auto;
     opacity:0;transition:opacity 1.6s ease}
   .slide.show{opacity:1}
-  /* with images: photo hugs the top, leftover space falls below it */
-  #session.withimg .slide{top:0;transform:translateX(-50%)}
+  /* with images: photo hugs the top and may use the whole screen */
+  #session.withimg .slide{top:0;transform:translateX(-50%);max-height:100%}
 
   #ring{position:relative;width:min(46vmin,260px);height:min(46vmin,260px);
     display:flex;align-items:center;justify-content:center}
-  /* the timer sits in the empty space under the photo (top set by script) */
+  /* the readout floats over/below the photo on its own background plate */
   #session.withimg #ring{
     position:absolute;top:auto;left:50%;transform:translateX(-50%);
-    width:104px;height:104px;margin:0;
-    background:rgba(16,20,34,.5);border-radius:50%;backdrop-filter:blur(8px);
+    width:auto;height:auto;margin:0;gap:11px;padding:9px 18px;
+    border-radius:999px;
+    background:rgba(10,13,22,var(--plate-a,.85));
+    border:1px solid rgba(232,230,220,calc(var(--plate-a,.85) * .16));
+    backdrop-filter:blur(10px);
+    box-shadow:0 6px 24px rgba(0,0,0,calc(var(--plate-a,.85) * .55));
+    white-space:nowrap;
   }
+  #session.withimg #ring svg{position:relative;inset:auto;width:26px;height:26px;flex:0 0 26px}
+  #session.withimg #pulse{display:none}
+  #session.withimg #clock{font-size:1.05rem;text-shadow:0 1px 6px rgba(0,0,0,.9)}
+  #session.withimg #repInfo{position:relative;bottom:auto;top:auto;left:auto;right:auto;
+    font-size:.72rem;text-shadow:0 1px 6px rgba(0,0,0,.9);padding-left:2px}
   #session.withimg #clock{font-size:1.05rem;text-shadow:0 1px 8px rgba(0,0,0,.8)}
   #session.withimg #repInfo{bottom:auto;top:-2.1em;font-size:.7rem;
     text-shadow:0 1px 8px rgba(0,0,0,.85)}
@@ -117,6 +153,14 @@
   #controls button:hover{border-color:var(--dusk)}
   #controls button:focus-visible{outline:2px solid var(--dusk)}
 
+  #plateWrap{display:none;align-items:center;gap:9px;
+    background:rgba(22,27,46,.75);backdrop-filter:blur(6px);
+    border:1px solid var(--line);border-radius:999px;padding:0 18px;height:44px}
+  #session.withimg #plateWrap{display:flex}
+  #session.hidetimer #plateWrap{display:none}
+  #plateWrap span{font-size:.72rem;color:var(--moon-dim);letter-spacing:.08em;text-transform:uppercase}
+  #sessPlate{width:104px;height:22px;accent-color:var(--dusk);cursor:pointer;margin:0}
+
   #done{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
     flex-direction:column;gap:20px;background:rgba(16,20,34,.72);backdrop-filter:blur(4px)}
   #done.show{display:flex}
@@ -132,7 +176,7 @@
   <header>
     <h1>STILL</h1>
     <p>Your files stay on this device — nothing is uploaded.</p>
-    <p style="font-size:.72rem;opacity:.45;margin-top:4px">v10</p>
+    <p style="font-size:.72rem;opacity:.45;margin-top:4px">v14</p>
   </header>
 
   <div class="card">
@@ -217,6 +261,38 @@
     <p class="hint" id="lenHint" style="display:none"></p>
     <label class="check"><input type="checkbox" id="chime"> Soft bell when the session ends</label>
     <label class="check"><input type="checkbox" id="hideTimer"> Hide the timer during the session</label>
+    <div class="row">
+      <div class="field">
+        <label for="plateA">Timer background — <span id="plateVal">85</span>% opaque (lower = more see-through)</label>
+        <input type="range" id="plateA" min="0" max="100" step="5" value="85">
+      </div>
+    </div>
+  </div>
+
+
+  <div class="card" id="cardStats">
+    <h2>Your practice</h2>
+    <div id="emptyStats">No sessions recorded yet. Finish a session and it will appear here.</div>
+    <div id="statsBody" style="display:none">
+      <div class="statgrid">
+        <div class="stat"><b id="stTotal">0</b><span>Total time</span></div>
+        <div class="stat"><b id="stCount">0</b><span>Sessions</span></div>
+        <div class="stat"><b id="stStreak">0</b><span>Day streak</span></div>
+        <div class="stat"><b id="stBest">0</b><span>Best streak</span></div>
+        <div class="stat"><b id="stWeek">0</b><span>This week</span></div>
+        <div class="stat"><b id="stAvg">0</b><span>Avg session</span></div>
+      </div>
+      <div class="chart" id="chart"></div>
+      <div class="chartlabels" id="chartLabels"></div>
+      <div class="sesslist" id="sessList"></div>
+    </div>
+    <div class="btnrow">
+      <button id="exportBtn" type="button">Back up to file</button>
+      <button id="importBtn" type="button">Restore from file</button>
+      <button id="clearBtn" type="button" class="danger">Clear stats</button>
+    </div>
+    <input type="file" id="importInput" accept="application/json,.json">
+    <div id="statMsg"></div>
   </div>
 
   <button id="beginBtn" disabled>Begin</button>
@@ -243,6 +319,7 @@
   <div id="controls">
     <button id="pauseBtn" type="button">Pause</button>
     <button id="timerBtn" type="button">Hide timer</button>
+    <div id="plateWrap"><span>Panel</span><input type="range" id="sessPlate" min="0" max="100" step="5" value="85" aria-label="Timer background opacity"></div>
     <button id="fsBtn" type="button">Fullscreen</button>
     <button id="stopBtn" type="button">End session</button>
   </div>
@@ -262,6 +339,7 @@ const $ = id => document.getElementById(id);
 let audioBuffer=null, images=[], ctx=null, currentSource=null;
 let pauseTimer=null, imgTimer=null, uiTimer=null, idleTimer=null, wakeLock=null;
 let bgEl=null, bgUrl=null;               // background-mode audio element + blob url
+let audioFileName='';
 
 const S={
   type:'sound',                 // 'sound' | 'images' | 'both'
@@ -338,6 +416,7 @@ async function loadAudio(file){
     const tmp=new (window.AudioContext||window.webkitAudioContext)();
     audioBuffer=await tmp.decodeAudioData(await file.arrayBuffer());
     tmp.close();
+    audioFileName=file.name;
     $('audioName').textContent=file.name+' — '+fmt(audioBuffer.duration);
   }catch(err){
     audioBuffer=null;$('audioName').textContent='';
@@ -395,6 +474,7 @@ try{
   if(v.chime)$('chime').checked=true;
   if(v.hideTimer)$('hideTimer').checked=true;
   if(v.bgMode)$('bgMode').checked=true;
+  if(v.plateA!=null){$('plateA').value=v.plateA;$('sessPlate').value=v.plateA;$('plateVal').textContent=v.plateA;}
   setType(v.type||'sound');
   setMode(v.mode||'count');
 }catch(e){ setType('sound'); }
@@ -421,7 +501,7 @@ $('beginBtn').addEventListener('click',async()=>{
   try{localStorage.setItem('still-v2',JSON.stringify({
     type:S.type,mode:S.mode,pause:S.pause,reps:S.reps,min:S.totalSec/60,
     imgMode:$('imgMode').value,imgInt:$('imgInt').value,showSec:$('showSec').value,
-    chime:S.chime,hideTimer:$('hideTimer').checked,bgMode:$('bgMode').checked
+    chime:S.chime,hideTimer:$('hideTimer').checked,bgMode:$('bgMode').checked,plateA:$('plateA').value
   }));}catch(e){}
 
   ctx=new (window.AudioContext||window.webkitAudioContext)();
@@ -432,6 +512,8 @@ $('beginBtn').addEventListener('click',async()=>{
   sess.classList.add('active');
   sess.classList.toggle('withimg',S.type!=='sound');
   sess.classList.toggle('hidetimer',$('hideTimer').checked);
+  sess.style.setProperty('--plate-a',(parseInt($('plateA').value)||85)/100);
+  $('sessPlate').value=$('plateA').value;
   $('timerBtn').textContent=$('hideTimer').checked?'Show timer':'Hide timer';
   $('done').classList.remove('show');
 
@@ -624,10 +706,12 @@ $('stopBtn').addEventListener('click',()=>finish(true));
 $('backBtn').addEventListener('click',teardown);
 
 function finish(manual){
+  const secDone=elapsed();          // capture before teardown clears the clock source
   S.running=false;
   clearTimeout(pauseTimer);clearTimeout(imgTimer);
   if(currentSource){try{currentSource.onended=null;currentSource.stop();}catch(e){}currentSource=null;}
   stopBg();
+  recordSession(secDone,!manual);
   $('session').classList.remove('playing','idlehide');
   if(!manual&&S.chime){try{ctx.resume().then(()=>bell());}catch(e){}}
   $('done').classList.add('show');
@@ -667,25 +751,38 @@ function showImage(i){
   layoutRing();
 }
 
-/* place the timer in the empty space directly beneath the displayed photo */
+/* put the readout just under the photo; if the photo fills the screen it rides near the bottom */
 function layoutRing(){
   const sess=$('session'), ring=$('ring'), stage=$('stage');
   if(!sess.classList.contains('withimg')||sess.classList.contains('hidetimer')) return;
   const vis=$('bgA').classList.contains('show')?$('bgA'):$('bgB');
   if(!vis.naturalWidth) return;
   const sW=stage.clientWidth, sH=stage.clientHeight;
-  const shownH=Math.min(sH, sW*vis.naturalHeight/vis.naturalWidth);   // top-aligned height
-  const ringH=ring.offsetHeight||104;
-  const maxTop=sH-ringH-92;                    // stay clear of the buttons
+  const shownH=Math.min(sH, sW*vis.naturalHeight/vis.naturalWidth);
+  const ringH=ring.offsetHeight||44;
+  const maxTop=sH-ringH-92;                     // keep clear of the buttons
   ring.style.top=Math.max(8,Math.min(shownH+14,maxTop))+'px';
 }
 window.addEventListener('resize',layoutRing);
 document.addEventListener('fullscreenchange',()=>setTimeout(layoutRing,60));
 
+/* transparency: adjustable on the setup screen AND mid-session; last value sticks */
+function applyPlate(v,fromSession){
+  v=Math.max(0,Math.min(100,parseInt(v)||0));
+  $('session').style.setProperty('--plate-a',v/100);
+  $('plateVal').textContent=v;
+  if(fromSession) $('plateA').value=v; else $('sessPlate').value=v;
+  try{
+    const o=JSON.parse(localStorage.getItem('still-v2')||'{}');
+    o.plateA=v; localStorage.setItem('still-v2',JSON.stringify(o));
+  }catch(e){}
+}
+$('plateA').addEventListener('input',e=>applyPlate(e.target.value,false));
+$('sessPlate').addEventListener('input',e=>{applyPlate(e.target.value,true);armIdleHide();});
+
 /* show / hide the timer mid-session */
 $('timerBtn').addEventListener('click',()=>{
-  const sess=$('session');
-  const hidden=sess.classList.toggle('hidetimer');
+  const hidden=$('session').classList.toggle('hidetimer');
   $('timerBtn').textContent=hidden?'Show timer':'Hide timer';
   if(!hidden) layoutRing();
   armIdleHide();
@@ -747,6 +844,160 @@ function releaseWake(){if(wakeLock){wakeLock.release().catch(()=>{});wakeLock=nu
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible'&&S.running&&!wakeLock)requestWake();
 });
+
+/* ================= practice stats ================= */
+const STATS_KEY='still-stats';
+function loadStats(){
+  try{const a=JSON.parse(localStorage.getItem(STATS_KEY)||'[]');return Array.isArray(a)?a:[];}
+  catch(e){return [];}
+}
+function saveStats(a){try{localStorage.setItem(STATS_KEY,JSON.stringify(a));}catch(e){}}
+
+function recordSession(sec,completed){
+  if(sec<5) return;                     // ignore accidental taps
+  const list=loadStats();
+  list.push({
+    id:Date.now()+'-'+Math.random().toString(36).slice(2,8),
+    at:new Date().toISOString(),
+    sec:Math.round(sec),
+    type:S.type,
+    mode:S.mode,
+    done:S.type==='images'?S.repsDone:(S.bg?S.dispRep:S.repsDone),
+    completed:!!completed,
+    sound:audioFileName||'',
+    imgs:images.length
+  });
+  saveStats(list);
+  renderStats();
+}
+
+function dayKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function hm(sec){
+  const m=Math.round(sec/60);
+  if(m<60) return m+'m';
+  return Math.floor(m/60)+'h '+(m%60)+'m';
+}
+function streaks(list){
+  const days=new Set(list.map(s=>dayKey(new Date(s.at))));
+  if(!days.size) return {cur:0,best:0};
+  const sorted=[...days].sort();
+  // best streak
+  let best=1,run=1;
+  for(let i=1;i<sorted.length;i++){
+    const prev=new Date(sorted[i-1]+'T00:00'), cur=new Date(sorted[i]+'T00:00');
+    run = ((cur-prev)/86400000===1) ? run+1 : 1;
+    if(run>best) best=run;
+  }
+  // current streak: count back from today (or yesterday if nothing today yet)
+  let cur=0; const probe=new Date();
+  if(!days.has(dayKey(probe))) probe.setDate(probe.getDate()-1);
+  while(days.has(dayKey(probe))){cur++;probe.setDate(probe.getDate()-1);}
+  return {cur,best};
+}
+
+function renderStats(){
+  const list=loadStats();
+  $('emptyStats').style.display=list.length?'none':'';
+  $('statsBody').style.display=list.length?'':'none';
+  if(!list.length) return;
+
+  const total=list.reduce((n,s)=>n+s.sec,0);
+  $('stTotal').textContent=hm(total);
+  $('stCount').textContent=list.length;
+  const st=streaks(list);
+  $('stStreak').textContent=st.cur;
+  $('stBest').textContent=st.best;
+  const weekAgo=Date.now()-7*86400000;
+  $('stWeek').textContent=hm(list.filter(s=>new Date(s.at).getTime()>=weekAgo).reduce((n,s)=>n+s.sec,0));
+  $('stAvg').textContent=hm(total/list.length);
+
+  // 14-day chart
+  const byDay={};
+  list.forEach(s=>{const k=dayKey(new Date(s.at));byDay[k]=(byDay[k]||0)+s.sec;});
+  const days=[];
+  for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push({d,sec:byDay[dayKey(d)]||0});}
+  const peak=Math.max(60,...days.map(x=>x.sec));
+  const chart=$('chart'), labels=$('chartLabels');
+  chart.innerHTML=''; labels.innerHTML='';
+  days.forEach((x,i)=>{
+    const bar=document.createElement('div');
+    bar.style.height=Math.max(2,Math.round(x.sec/peak*80))+'px';
+    if(x.sec>0) bar.classList.add('has');
+    bar.title=dayKey(x.d)+': '+hm(x.sec);
+    chart.appendChild(bar);
+    const lb=document.createElement('span');
+    lb.textContent = (i%2===0) ? 'SMTWTFS'[x.d.getDay()] : '';
+    labels.appendChild(lb);
+  });
+
+  // recent sessions
+  const wrap=$('sessList'); wrap.innerHTML='';
+  list.slice(-6).reverse().forEach(s=>{
+    const row=document.createElement('div'); row.className='sessrow';
+    const d=new Date(s.at);
+    const left=document.createElement('span');
+    left.textContent=d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+
+      ' · '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+    const right=document.createElement('span');
+    const kind=s.type==='images'?'images':s.type==='both'?'sound + images':'sound';
+    const unit=s.type==='images'?' rounds':' plays';
+    right.textContent=hm(s.sec)+' · '+kind+(s.done?' · '+s.done+unit:'')+(s.completed?'':' · ended early');
+    row.appendChild(left); row.appendChild(right);
+    wrap.appendChild(row);
+  });
+}
+
+/* backup / restore */
+$('exportBtn').addEventListener('click',()=>{
+  const list=loadStats();
+  if(!list.length){$('statMsg').textContent='Nothing to back up yet.';return;}
+  const blob=new Blob([JSON.stringify({app:'still',version:1,exported:new Date().toISOString(),sessions:list},null,2)],
+    {type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='still-stats-'+dayKey(new Date())+'.json';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+  $('statMsg').textContent='Backed up '+list.length+' session'+(list.length===1?'':'s')+'.';
+});
+
+$('importBtn').addEventListener('click',()=>$('importInput').click());
+$('importInput').addEventListener('change',async e=>{
+  const f=e.target.files&&e.target.files[0];
+  if(!f) return;
+  try{
+    const data=JSON.parse(await f.text());
+    const incoming=Array.isArray(data)?data:(data.sessions||[]);
+    if(!Array.isArray(incoming)||!incoming.length) throw 0;
+    const cur=loadStats();
+    const seen=new Set(cur.map(s=>s.id||s.at));
+    let added=0;
+    incoming.forEach(s=>{
+      if(!s||!s.at||typeof s.sec!=='number') return;
+      const key=s.id||s.at;
+      if(seen.has(key)) return;
+      seen.add(key); cur.push(s); added++;
+    });
+    cur.sort((a,b)=>new Date(a.at)-new Date(b.at));
+    saveStats(cur); renderStats();
+    $('statMsg').textContent=added?('Restored '+added+' session'+(added===1?'':'s')+' (duplicates skipped).')
+                                  :'Already up to date — no new sessions found.';
+  }catch(err){
+    $('statMsg').textContent='That file could not be read. Please pick a backup file made by this app.';
+  }
+  e.target.value='';
+});
+
+$('clearBtn').addEventListener('click',()=>{
+  if(!loadStats().length){$('statMsg').textContent='No stats to clear.';return;}
+  if(confirm('Delete all recorded sessions? Back up first if you want to keep them.')){
+    localStorage.removeItem(STATS_KEY); renderStats();
+    $('statMsg').textContent='Stats cleared.';
+  }
+});
+
+renderStats();
+
 })();
 </script>
 </body>
