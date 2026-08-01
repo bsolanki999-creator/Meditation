@@ -117,6 +117,33 @@
   #moreBtn{background:none;border:0;color:var(--dusk);font-size:.82rem;font-family:inherit;
     cursor:pointer;padding:10px 2px 0}
   #moreBtn:hover{text-decoration:underline}
+  .statshead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  #editBtn{background:var(--ink-3);border:1px solid var(--line);color:var(--moon-dim);
+    border-radius:8px;padding:7px 13px;font-size:.8rem;font-family:inherit;cursor:pointer;
+    display:none;align-items:center;gap:6px}
+  #editBtn:hover{border-color:var(--dusk);color:var(--moon)}
+  #editBtn.on{border-color:var(--dusk);background:var(--dusk-soft);color:var(--moon)}
+  /* delete buttons stay hidden until edit mode is switched on */
+  .sessrow button{display:none}
+  #statsBody.editing .sessrow button{display:block}
+  #statsBody.editing .sessrow{background:rgba(232,230,220,.03)}
+
+  /* confirmation dialog */
+  #confirm{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
+    background:rgba(8,10,18,.72);backdrop-filter:blur(4px);padding:22px}
+  #confirm.show{display:flex}
+  #confirmBox{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px 22px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+  #confirmBox h3{font-family:Georgia,serif;font-weight:400;font-size:1.25rem;margin-bottom:9px}
+  #confirmBox p{font-size:.9rem;color:var(--moon-dim);margin-bottom:20px}
+  #confirmBox .btns{display:flex;gap:10px}
+  #confirmBox button{flex:1;border-radius:9px;padding:12px;font-size:.95rem;
+    font-family:inherit;cursor:pointer;border:1px solid var(--line)}
+  #cancelBtn{background:var(--ink-3);color:var(--moon)}
+  #cancelBtn:hover{border-color:var(--dusk)}
+  #okBtn{background:#8f5b5b;color:#fdf3f3;border-color:transparent;font-weight:600}
+  #okBtn:hover{background:#a06666}
+
   .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
   .btnrow button{flex:1 1 120px;background:var(--ink-3);color:var(--moon);
     border:1px solid var(--line);border-radius:9px;padding:11px 10px;
@@ -128,6 +155,56 @@
     font-size:.82rem;text-decoration:underline;cursor:pointer;padding:0 2px}
   #statMsg button:hover{color:var(--dusk)}
   #emptyStats{color:var(--moon-dim);font-size:.9rem}
+
+
+  /* dashboard v2 */
+  .goalrow{display:flex;align-items:center;gap:10px;margin-top:16px;
+    background:var(--ink-3);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .goalrow label{margin:0;flex:1;font-size:.84rem}
+  .goalrow input{width:74px;background:var(--ink-2);color:var(--moon);border:1px solid var(--line);
+    border-radius:7px;padding:7px 9px;font-size:.95rem;font-family:inherit}
+  .goalbar{height:6px;background:rgba(232,230,220,.1);border-radius:99px;margin-top:10px;overflow:hidden}
+  .goalbar div{height:100%;background:var(--dusk);border-radius:99px;transition:width .4s}
+  .goaltext{font-size:.78rem;color:var(--moon-dim);margin-top:7px}
+
+  .sectionlabel{font-size:.7rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--moon-dim);margin:22px 0 10px}
+  .heat{display:flex;gap:3px;overflow-x:auto;padding-bottom:3px}
+  .heatcol{display:flex;flex-direction:column;gap:3px}
+  .heatcell{width:12px;height:12px;border-radius:2px;background:rgba(232,230,220,.07)}
+  .heatcell.l1{background:rgba(143,155,212,.32)}
+  .heatcell.l2{background:rgba(143,155,212,.55)}
+  .heatcell.l3{background:rgba(143,155,212,.78)}
+  .heatcell.l4{background:var(--dusk)}
+  .heatlegend{display:flex;align-items:center;gap:5px;justify-content:flex-end;
+    font-size:.65rem;color:var(--moon-dim);margin-top:7px}
+  .heatlegend .heatcell{width:10px;height:10px}
+
+  .todrow{display:flex;align-items:center;gap:9px;margin-bottom:6px;font-size:.78rem}
+  .todrow span:first-child{width:74px;color:var(--moon-dim);flex:0 0 74px}
+  .todbar{flex:1;height:14px;background:rgba(232,230,220,.07);border-radius:4px;overflow:hidden}
+  .todbar div{height:100%;background:var(--dusk-soft);border-radius:4px}
+  .todbar div.top{background:var(--dusk)}
+  .todrow span:last-child{width:52px;text-align:right;color:var(--moon-dim);flex:0 0 52px}
+
+  .recgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .rec{background:var(--ink-3);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+  .rec b{display:block;font-size:1rem;color:var(--moon);font-weight:500}
+  .rec span{font-size:.7rem;color:var(--moon-dim);letter-spacing:.05em;text-transform:uppercase}
+
+  .miles{display:flex;flex-wrap:wrap;gap:7px}
+  .mile{font-size:.75rem;padding:6px 11px;border-radius:99px;
+    background:var(--dusk-soft);color:var(--moon);border:1px solid rgba(143,155,212,.35)}
+  .mile.next{background:none;color:var(--moon-dim);border-style:dashed;border-color:var(--line)}
+
+  .tagchips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:4px}
+  .tagchip{background:rgba(22,27,46,.8);color:var(--moon-dim);border:1px solid var(--line);
+    border-radius:99px;padding:9px 16px;font-size:.85rem;font-family:inherit;cursor:pointer}
+  .tagchip:hover{border-color:var(--dusk);color:var(--moon)}
+  .tagchip.on{background:var(--dusk);color:var(--ink);border-color:transparent;font-weight:600}
+  #doneTagLabel{font-size:.78rem;color:var(--moon-dim);letter-spacing:.06em}
+  .sessrow em{font-style:normal;color:var(--dusk);font-size:.72rem;margin-left:7px;
+    background:var(--dusk-soft);padding:1px 7px;border-radius:99px}
 
   /* ---------- SESSION ---------- */
   #session{display:none;position:fixed;inset:0;background:var(--ink);
@@ -215,7 +292,7 @@
   <header>
     <h1>STILL</h1>
     <p>Your files stay on this device — nothing is uploaded.</p>
-    <p style="font-size:.72rem;opacity:.45;margin-top:4px">v16</p>
+    <p style="font-size:.72rem;opacity:.45;margin-top:4px">v18</p>
   </header>
 
   <div class="card">
@@ -321,7 +398,10 @@
 
 
   <div class="card" id="cardStats">
-    <h2>Your practice</h2>
+    <div class="statshead">
+      <h2 style="margin-bottom:14px">Your practice</h2>
+      <button id="editBtn" type="button"><span aria-hidden="true">✎</span> Edit</button>
+    </div>
     <div id="emptyStats">No sessions recorded yet. Finish a session and it will appear here.</div>
     <div id="statsBody" style="display:none">
       <div class="statgrid">
@@ -331,14 +411,48 @@
         <div class="stat"><b id="stBest">0</b><span>Best streak</span></div>
         <div class="stat"><b id="stWeek">0</b><span>This week</span></div>
         <div class="stat"><b id="stAvg">0</b><span>Avg session</span></div>
+        <div class="stat"><b id="stConsist">0</b><span>Consistency</span></div>
+        <div class="stat"><b id="stFinish">0</b><span>Finished fully</span></div>
       </div>
+      <div class="goalrow">
+        <label for="goalMin">Weekly goal (minutes)</label>
+        <input type="number" id="goalMin" min="0" step="10" value="100">
+      </div>
+      <div class="goalbar"><div id="goalFill" style="width:0%"></div></div>
+      <div class="goaltext" id="goalText"></div>
+
+      <div class="sectionlabel">Last 14 days</div>
       <div class="chart" id="chart"></div>
       <div class="chartlabels" id="chartLabels"></div>
+
+      <div class="sectionlabel">Practice calendar</div>
+      <div class="heat" id="heat"></div>
+      <div class="heatlegend"><span>less</span>
+        <span class="heatcell"></span><span class="heatcell l1"></span>
+        <span class="heatcell l2"></span><span class="heatcell l3"></span>
+        <span class="heatcell l4"></span><span>more</span></div>
+
+      <div class="sectionlabel">When you practise</div>
+      <div id="tod"></div>
+
+      <div class="sectionlabel">Personal records</div>
+      <div class="recgrid">
+        <div class="rec"><b id="recLong">—</b><span>Longest session</span></div>
+        <div class="rec"><b id="recStreak">—</b><span>Longest streak</span></div>
+        <div class="rec"><b id="recWeek">—</b><span>Biggest week</span></div>
+        <div class="rec"><b id="recDay">—</b><span>Biggest day</span></div>
+      </div>
+
+      <div class="sectionlabel">Milestones</div>
+      <div class="miles" id="miles"></div>
+
+      <div class="sectionlabel">Recent sessions</div>
       <div class="sesslist" id="sessList"></div>
       <button id="moreBtn" type="button" style="display:none"></button>
     </div>
     <div class="btnrow">
       <button id="exportBtn" type="button">Back up to file</button>
+      <button id="csvBtn" type="button">Export CSV</button>
       <button id="importBtn" type="button">Restore from file</button>
       <button id="clearBtn" type="button" class="danger">Clear stats</button>
     </div>
@@ -349,6 +463,17 @@
 
   <button id="beginBtn" disabled>Begin</button>
   <div id="err" role="alert"></div>
+</div>
+
+<div id="confirm" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div id="confirmBox">
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p id="confirmText"></p>
+    <div class="btns">
+      <button id="cancelBtn" type="button">Cancel</button>
+      <button id="okBtn" type="button">Delete</button>
+    </div>
+  </div>
 </div>
 
 <!-- ================= SESSION ================= -->
@@ -378,6 +503,8 @@
 
   <div id="done">
     <h2>Session complete</h2>
+    <div id="doneTagLabel">Tag this session (optional)</div>
+    <div class="tagchips" id="doneTags"></div>
     <button id="backBtn" type="button">Return</button>
   </div>
 </div>
@@ -401,7 +528,8 @@ const S={
   imgMode:'static', interval:30, imgIndex:0, bgFlip:false,
   chime:false, target:0,
   repOffset:0, repStartT:0, midRep:false,  // for exact pause/resume of sound
-  bg:null, epoch:0, pausedMs:0, pauseStamp:0, dispRep:0  // background ("screen off") mode
+  bg:null, epoch:0, pausedMs:0, pauseStamp:0, dispRep:0,  // background ("screen off") mode
+  pauseCount:0, pausedTotal:0, pauseAt:0
 };
 
 /* ---------- session type picker ---------- */
@@ -549,6 +677,7 @@ try{
   if(v.hideTimer)$('hideTimer').checked=true;
   if(v.bgMode)$('bgMode').checked=true;
   if(v.plateA!=null){$('plateA').value=v.plateA;$('sessPlate').value=v.plateA;$('plateVal').textContent=v.plateA;}
+  if(v.goal!=null)$('goalMin').value=v.goal;
   setType(v.type||'sound');
   setMode(v.mode||'count');
 }catch(e){ setType('sound'); }
@@ -565,6 +694,7 @@ $('beginBtn').addEventListener('click',async()=>{
     : Math.max(0.1,parseFloat($('imgInt').value)||30);
   S.repsDone=0;S.imgIndex=0;S.bgFlip=false;S.paused=false;S.running=true;
   S.elapsedBase=0;S.repOffset=0;S.midRep=false;S.bg=null;
+  S.pauseCount=0;S.pausedTotal=0;S.pauseAt=0;
   $('err').textContent='';
 
   S.target = S.mode==='time' ? S.totalSec
@@ -741,6 +871,7 @@ function togglePause(){
   if(!S.paused){
     S.elapsedBase=elapsed();          // capture time BEFORE flagging paused (order matters!)
     S.paused=true;
+    S.pauseCount++; S.pauseAt=Date.now();
     if(S.bg){
       if(bgEl) bgEl.pause();
       S.pauseStamp=Date.now();
@@ -757,6 +888,8 @@ function togglePause(){
     $('session').classList.remove('playing');
   }else{
     S.paused=false;
+    if(S.pauseAt) S.pausedTotal+=(Date.now()-S.pauseAt)/1000;
+    S.pauseAt=0;
     S.segmentStart=performance.now();
     if(S.bg){
       S.pausedMs+=Date.now()-S.pauseStamp;
@@ -786,6 +919,10 @@ function finish(manual){
   if(currentSource){try{currentSource.onended=null;currentSource.stop();}catch(e){}currentSource=null;}
   stopBg();
   recordSession(secDone,!manual);
+  [...$('doneTags').children].forEach(c=>c.classList.remove('on'));
+  const tagOK=!!lastSessionId;
+  $('doneTags').style.display=tagOK?'':'none';
+  $('doneTagLabel').style.display=tagOK?'':'none';
   $('session').classList.remove('playing','idlehide');
   if(!manual&&S.chime){try{ctx.resume().then(()=>bell());}catch(e){}}
   $('done').classList.add('show');
@@ -1063,22 +1200,51 @@ function loadStats(){
 function saveStats(a){try{localStorage.setItem(STATS_KEY,JSON.stringify(a));}catch(e){}}
 
 function recordSession(sec,completed){
-  if(sec<5) return;                     // ignore accidental taps
+  if(sec<5){lastSessionId=null;return;}          // ignore accidental taps
   const list=loadStats();
-  list.push({
+  const rec={
     id:Date.now()+'-'+Math.random().toString(36).slice(2,8),
     at:new Date().toISOString(),
     sec:Math.round(sec),
+    planned:Math.round(S.target||0),
     type:S.type,
     mode:S.mode,
     done:S.type==='images'?S.repsDone:(S.bg?S.dispRep:S.repsDone),
     completed:!!completed,
     sound:audioFileName||'',
-    imgs:images.length
-  });
+    imgs:images.length,
+    pauses:S.pauseCount||0,
+    pausedSec:Math.round(S.pausedTotal||0),
+    hour:new Date().getHours(),
+    tag:''
+  };
+  lastSessionId=rec.id;
+  list.push(rec);
   saveStats(list);
   renderStats();
 }
+
+/* ---- tags, chosen on the completion screen ---- */
+const TAGS=['Calm','Focus','Sleep','Gratitude','Grief','Energy'];
+let lastSessionId=null;
+function buildTagChips(){
+  const wrap=$('doneTags'); wrap.innerHTML='';
+  TAGS.forEach(t=>{
+    const b=document.createElement('button');
+    b.type='button'; b.className='tagchip'; b.textContent=t;
+    b.addEventListener('click',()=>{
+      if(!lastSessionId) return;
+      const list=loadStats();
+      const rec=list.find(r=>r.id===lastSessionId);
+      if(!rec) return;
+      rec.tag = rec.tag===t ? '' : t;                 // tap again to clear
+      saveStats(list); renderStats();
+      [...wrap.children].forEach(c=>c.classList.toggle('on',c.textContent===rec.tag));
+    });
+    wrap.appendChild(b);
+  });
+}
+buildTagChips();
 
 function dayKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function hm(sec){
@@ -1104,7 +1270,34 @@ function streaks(list){
   return {cur,best};
 }
 
-let statsExpanded=false, lastDeleted=null;
+let statsExpanded=false, lastDeleted=null, editMode=false, confirmAction=null;
+
+/* styled confirmation dialog (replaces the browser's plain popup) */
+function askConfirm(title,text,okLabel,onYes){
+  $('confirmTitle').textContent=title;
+  $('confirmText').textContent=text;
+  $('okBtn').textContent=okLabel;
+  confirmAction=onYes;
+  $('confirm').classList.add('show');
+  setTimeout(()=>$('cancelBtn').focus(),30);
+}
+function closeConfirm(){$('confirm').classList.remove('show');confirmAction=null;}
+$('cancelBtn').addEventListener('click',closeConfirm);
+$('okBtn').addEventListener('click',()=>{const a=confirmAction;closeConfirm();if(a)a();});
+$('confirm').addEventListener('click',e=>{if(e.target===$('confirm'))closeConfirm();});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&$('confirm').classList.contains('show')) closeConfirm();
+});
+
+/* edit mode: delete buttons stay hidden until this is switched on */
+$('editBtn').addEventListener('click',()=>{
+  editMode=!editMode;
+  $('statsBody').classList.toggle('editing',editMode);
+  $('editBtn').classList.toggle('on',editMode);
+  $('editBtn').innerHTML=editMode?'<span aria-hidden="true">✓</span> Done'
+                                 :'<span aria-hidden="true">✎</span> Edit';
+  $('statMsg').textContent=editMode?'Tap × on a session to delete it.':'';
+});
 
 function deleteSession(target){
   const list=loadStats();
@@ -1130,12 +1323,25 @@ function deleteSession(target){
 }
 
 $('moreBtn').addEventListener('click',()=>{statsExpanded=!statsExpanded;renderStats();});
+$('goalMin').addEventListener('input',()=>{
+  try{const o=JSON.parse(localStorage.getItem('still-v2')||'{}');
+      o.goal=$('goalMin').value; localStorage.setItem('still-v2',JSON.stringify(o));}catch(e){}
+  renderStats();
+});
 
 function renderStats(){
   const list=loadStats();
   $('emptyStats').style.display=list.length?'none':'';
   $('statsBody').style.display=list.length?'':'none';
-  if(!list.length) return;
+  $('editBtn').style.display=list.length?'flex':'none';
+  if(!list.length){
+    editMode=false;
+    $('statsBody').classList.remove('editing');
+    $('editBtn').classList.remove('on');
+    $('editBtn').innerHTML='<span aria-hidden="true">✎</span> Edit';
+    return;
+  }
+  $('statsBody').classList.toggle('editing',editMode);
 
   const total=list.reduce((n,s)=>n+s.sec,0);
   $('stTotal').textContent=hm(total);
@@ -1166,6 +1372,103 @@ function renderStats(){
     labels.appendChild(lb);
   });
 
+  // ---- consistency & completion ----
+  const firstDay=new Date(list[0].at); firstDay.setHours(0,0,0,0);
+  const daysSince=Math.max(1,Math.round((Date.now()-firstDay.getTime())/86400000)+1);
+  const practised=new Set(list.map(x=>dayKey(new Date(x.at)))).size;
+  $('stConsist').textContent=Math.round(practised/daysSince*100)+'%';
+  $('stFinish').textContent=Math.round(list.filter(x=>x.completed).length/list.length*100)+'%';
+
+  // ---- weekly goal ----
+  const goal=Math.max(0,parseInt($('goalMin').value)||0);
+  const weekMin=list.filter(x=>new Date(x.at).getTime()>=weekAgo).reduce((n,x)=>n+x.sec,0)/60;
+  const pct=goal?Math.min(100,Math.round(weekMin/goal*100)):0;
+  $('goalFill').style.width=pct+'%';
+  $('goalText').textContent = goal
+    ? (weekMin>=goal
+        ? Math.round(weekMin)+' of '+goal+' minutes — goal reached.'
+        : Math.round(weekMin)+' of '+goal+' minutes this week · '+Math.max(0,Math.round(goal-weekMin))+' to go')
+    : 'Set a weekly target to track progress.';
+
+  // ---- calendar heatmap: last 16 weeks, weeks as columns ----
+  const heat=$('heat'); heat.innerHTML='';
+  const end=new Date(); end.setHours(0,0,0,0);
+  end.setDate(end.getDate()+(6-end.getDay()));            // end of this week (Sat)
+  const start=new Date(end); start.setDate(start.getDate()-16*7+1);
+  const dayMax=Math.max(...Object.values(byDay),1);
+  for(let w=0;w<16;w++){
+    const col=document.createElement('div'); col.className='heatcol';
+    for(let dow=0;dow<7;dow++){
+      const cur=new Date(start); cur.setDate(start.getDate()+w*7+dow);
+      const cell=document.createElement('div'); cell.className='heatcell';
+      if(cur<=new Date()){
+        const secs=byDay[dayKey(cur)]||0;
+        if(secs>0){
+          const r=secs/dayMax;
+          cell.classList.add(r>.75?'l4':r>.5?'l3':r>.25?'l2':'l1');
+        }
+        cell.title=cur.toLocaleDateString()+': '+(secs?hm(secs):'no practice');
+      }else{ cell.style.opacity='.25'; }
+      col.appendChild(cell);
+    }
+    heat.appendChild(col);
+  }
+
+  // ---- when you practise ----
+  const buckets=[['Early',5,9],['Morning',9,12],['Afternoon',12,17],['Evening',17,21],['Night',21,29]];
+  const bsec=buckets.map(()=>0);
+  list.forEach(x=>{
+    let h=(typeof x.hour==='number')?x.hour:new Date(x.at).getHours();
+    if(h<5) h+=24;
+    const i=buckets.findIndex(b=>h>=b[1]&&h<b[2]);
+    if(i>=0) bsec[i]+=x.sec;
+  });
+  const bmax=Math.max(...bsec,1);
+  const tod=$('tod'); tod.innerHTML='';
+  buckets.forEach((b,i)=>{
+    const row=document.createElement('div'); row.className='todrow';
+    const nm=document.createElement('span'); nm.textContent=b[0];
+    const bar=document.createElement('div'); bar.className='todbar';
+    const fill=document.createElement('div');
+    fill.style.width=Math.round(bsec[i]/bmax*100)+'%';
+    if(bsec[i]===bmax&&bsec[i]>0) fill.classList.add('top');
+    bar.appendChild(fill);
+    const val=document.createElement('span'); val.textContent=bsec[i]?hm(bsec[i]):'—';
+    row.appendChild(nm);row.appendChild(bar);row.appendChild(val);
+    tod.appendChild(row);
+  });
+
+  // ---- personal records ----
+  $('recLong').textContent=hm(Math.max(...list.map(x=>x.sec)));
+  $('recStreak').textContent=st.best+(st.best===1?' day':' days');
+  $('recDay').textContent=hm(dayMax);
+  const weekTotals={};
+  list.forEach(x=>{
+    const d=new Date(x.at); d.setHours(0,0,0,0); d.setDate(d.getDate()-d.getDay());
+    const k=dayKey(d); weekTotals[k]=(weekTotals[k]||0)+x.sec;
+  });
+  $('recWeek').textContent=hm(Math.max(...Object.values(weekTotals),0));
+
+  // ---- milestones ----
+  const totalMin=total/60, hours=total/3600;
+  const earned=[];
+  [[1,'First hour'],[5,'5 hours'],[10,'10 hours'],[25,'25 hours'],[50,'50 hours'],[100,'100 hours']]
+    .forEach(([h,label])=>{ if(hours>=h) earned.push(label); });
+  [[10,'10 sessions'],[25,'25 sessions'],[50,'50 sessions'],[100,'100 sessions']]
+    .forEach(([n,label])=>{ if(list.length>=n) earned.push(label); });
+  [[7,'7-day streak'],[30,'30-day streak'],[100,'100-day streak']]
+    .forEach(([n,label])=>{ if(st.best>=n) earned.push(label); });
+  const miles=$('miles'); miles.innerHTML='';
+  earned.slice(-6).forEach(label=>{
+    const m=document.createElement('div'); m.className='mile'; m.textContent='✓ '+label; miles.appendChild(m);
+  });
+  const nextH=[1,5,10,25,50,100].find(h=>hours<h);
+  if(nextH){
+    const m=document.createElement('div'); m.className='mile next';
+    m.textContent=Math.round((nextH-hours)*60)+' min to '+(nextH===1?'your first hour':nextH+' hours');
+    miles.appendChild(m);
+  }
+
   // recent sessions (newest first) with per-session delete
   const wrap=$('sessList'); wrap.innerHTML='';
   const newest=[...list].reverse();
@@ -1179,11 +1482,22 @@ function renderStats(){
     const right=document.createElement('span');
     const kind=s.type==='images'?'images':s.type==='both'?'sound + images':'sound';
     const unit=s.type==='images'?' rounds':' plays';
-    right.textContent=hm(s.sec)+' · '+kind+(s.done?' · '+s.done+unit:'')+(s.completed?'':' · ended early');
+    right.textContent=hm(s.sec)+' · '+kind+(s.done?' · '+s.done+unit:'')+
+      (s.pauses?' · '+s.pauses+' pause'+(s.pauses===1?'':'s'):'')+(s.completed?'':' · ended early');
+    if(s.tag){
+      const tg=document.createElement('em'); tg.textContent=' '+s.tag;
+      left.appendChild(tg);
+    }
     const del=document.createElement('button');
     del.type='button'; del.textContent='×'; del.title='Delete this session';
     del.setAttribute('aria-label','Delete this session');
-    del.addEventListener('click',()=>deleteSession(s));
+    del.addEventListener('click',()=>{
+      const when=d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+
+        ' at '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+      askConfirm('Delete this session?',
+        'The session from '+when+' ('+hm(s.sec)+') will be removed from your stats. You can undo straight after.',
+        'Delete',()=>deleteSession(s));
+    });
     row.appendChild(left); row.appendChild(right); row.appendChild(del);
     wrap.appendChild(row);
   });
@@ -1206,6 +1520,28 @@ $('exportBtn').addEventListener('click',()=>{
   document.body.appendChild(a); a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
   $('statMsg').textContent='Backed up '+list.length+' session'+(list.length===1?'':'s')+'.';
+});
+
+$('csvBtn').addEventListener('click',()=>{
+  const list=loadStats();
+  if(!list.length){$('statMsg').textContent='Nothing to export yet.';return;}
+  const cols=['date','time','minutes','planned_minutes','type','mode','count','completed','pauses','paused_minutes','tag','sound','images'];
+  const rows=[cols.join(',')];
+  list.forEach(s=>{
+    const d=new Date(s.at);
+    const cell=v=>{v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+    rows.push([d.toLocaleDateString(),d.toLocaleTimeString(),
+      (s.sec/60).toFixed(1),((s.planned||0)/60).toFixed(1),s.type,s.mode,s.done||0,
+      s.completed?'yes':'no',s.pauses||0,((s.pausedSec||0)/60).toFixed(1),
+      s.tag||'',s.sound||'',s.imgs||0].map(cell).join(','));
+  });
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='still-sessions-'+dayKey(new Date())+'.csv';
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+  $('statMsg').textContent='Exported '+list.length+' sessions as CSV.';
 });
 
 $('importBtn').addEventListener('click',()=>$('importInput').click());
@@ -1236,11 +1572,14 @@ $('importInput').addEventListener('change',async e=>{
 });
 
 $('clearBtn').addEventListener('click',()=>{
-  if(!loadStats().length){$('statMsg').textContent='No stats to clear.';return;}
-  if(confirm('Delete all recorded sessions? Back up first if you want to keep them.')){
-    localStorage.removeItem(STATS_KEY); renderStats();
-    $('statMsg').textContent='Stats cleared.';
-  }
+  const n=loadStats().length;
+  if(!n){$('statMsg').textContent='No stats to clear.';return;}
+  askConfirm('Clear all stats?',
+    'All '+n+' recorded session'+(n===1?'':'s')+' will be deleted permanently, and this cannot be undone. Back up to a file first if you want to keep them.',
+    'Delete everything',()=>{
+      localStorage.removeItem(STATS_KEY); statsExpanded=false; lastDeleted=null; renderStats();
+      $('statMsg').textContent='Stats cleared.';
+    });
 });
 
 renderStats();
