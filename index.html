@@ -111,6 +111,12 @@
     border-bottom:1px solid var(--line);font-size:.85rem}
   .sessrow span:first-child{color:var(--moon)}
   .sessrow span:last-child{color:var(--moon-dim);text-align:right;white-space:nowrap}
+  .sessrow button{background:none;border:0;color:var(--moon-dim);font-size:1.05rem;
+    line-height:1;padding:2px 6px;cursor:pointer;border-radius:5px;font-family:inherit;flex:0 0 auto}
+  .sessrow button:hover{color:#e0a3a3;background:rgba(224,163,163,.12)}
+  #moreBtn{background:none;border:0;color:var(--dusk);font-size:.82rem;font-family:inherit;
+    cursor:pointer;padding:10px 2px 0}
+  #moreBtn:hover{text-decoration:underline}
   .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
   .btnrow button{flex:1 1 120px;background:var(--ink-3);color:var(--moon);
     border:1px solid var(--line);border-radius:9px;padding:11px 10px;
@@ -118,6 +124,9 @@
   .btnrow button:hover{border-color:var(--dusk)}
   .btnrow button.danger:hover{border-color:#c98b8b;color:#e0a3a3}
   #statMsg{font-size:.82rem;color:var(--dusk);margin-top:10px;min-height:1.2em}
+  #statMsg button{background:none;border:0;color:var(--moon);font-family:inherit;
+    font-size:.82rem;text-decoration:underline;cursor:pointer;padding:0 2px}
+  #statMsg button:hover{color:var(--dusk)}
   #emptyStats{color:var(--moon-dim);font-size:.9rem}
 
   /* ---------- SESSION ---------- */
@@ -206,7 +215,7 @@
   <header>
     <h1>STILL</h1>
     <p>Your files stay on this device — nothing is uploaded.</p>
-    <p style="font-size:.72rem;opacity:.45;margin-top:4px">v15</p>
+    <p style="font-size:.72rem;opacity:.45;margin-top:4px">v16</p>
   </header>
 
   <div class="card">
@@ -326,6 +335,7 @@
       <div class="chart" id="chart"></div>
       <div class="chartlabels" id="chartLabels"></div>
       <div class="sesslist" id="sessList"></div>
+      <button id="moreBtn" type="button" style="display:none"></button>
     </div>
     <div class="btnrow">
       <button id="exportBtn" type="button">Back up to file</button>
@@ -1094,6 +1104,33 @@ function streaks(list){
   return {cur,best};
 }
 
+let statsExpanded=false, lastDeleted=null;
+
+function deleteSession(target){
+  const list=loadStats();
+  const key=target.id||target.at;
+  const idx=list.findIndex(s=>(s.id||s.at)===key);
+  if(idx<0) return;
+  lastDeleted=list.splice(idx,1)[0];
+  saveStats(list); renderStats();
+  const d=new Date(lastDeleted.at);
+  $('statMsg').innerHTML='';
+  $('statMsg').append('Deleted the session from '+
+    d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+'. ');
+  const undo=document.createElement('button');
+  undo.type='button'; undo.id='undoBtn'; undo.textContent='Undo';
+  undo.addEventListener('click',()=>{
+    if(!lastDeleted) return;
+    const cur=loadStats();
+    cur.push(lastDeleted); cur.sort((a,b)=>new Date(a.at)-new Date(b.at));
+    saveStats(cur); lastDeleted=null; renderStats();
+    $('statMsg').textContent='Session restored.';
+  });
+  $('statMsg').append(undo);
+}
+
+$('moreBtn').addEventListener('click',()=>{statsExpanded=!statsExpanded;renderStats();});
+
 function renderStats(){
   const list=loadStats();
   $('emptyStats').style.display=list.length?'none':'';
@@ -1129,9 +1166,11 @@ function renderStats(){
     labels.appendChild(lb);
   });
 
-  // recent sessions
+  // recent sessions (newest first) with per-session delete
   const wrap=$('sessList'); wrap.innerHTML='';
-  list.slice(-6).reverse().forEach(s=>{
+  const newest=[...list].reverse();
+  const shown=statsExpanded?newest:newest.slice(0,6);
+  shown.forEach(s=>{
     const row=document.createElement('div'); row.className='sessrow';
     const d=new Date(s.at);
     const left=document.createElement('span');
@@ -1141,9 +1180,18 @@ function renderStats(){
     const kind=s.type==='images'?'images':s.type==='both'?'sound + images':'sound';
     const unit=s.type==='images'?' rounds':' plays';
     right.textContent=hm(s.sec)+' · '+kind+(s.done?' · '+s.done+unit:'')+(s.completed?'':' · ended early');
-    row.appendChild(left); row.appendChild(right);
+    const del=document.createElement('button');
+    del.type='button'; del.textContent='×'; del.title='Delete this session';
+    del.setAttribute('aria-label','Delete this session');
+    del.addEventListener('click',()=>deleteSession(s));
+    row.appendChild(left); row.appendChild(right); row.appendChild(del);
     wrap.appendChild(row);
   });
+  const more=$('moreBtn');
+  if(newest.length>6){
+    more.style.display='';
+    more.textContent=statsExpanded?'Show fewer':('Show all '+newest.length+' sessions');
+  }else{ more.style.display='none'; statsExpanded=false; }
 }
 
 /* backup / restore */
