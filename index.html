@@ -66,6 +66,36 @@
   #err{color:#e0a3a3;font-size:.9rem;text-align:center;margin-top:12px;min-height:1.3em}
 
 
+
+  /* ---------- saved library ---------- */
+  .lib{margin-top:14px}
+  .lib h3{font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--moon-dim);margin-bottom:9px}
+  .librow{display:flex;align-items:center;gap:10px;padding:9px 12px;margin-bottom:7px;
+    background:var(--ink-3);border:1px solid var(--line);border-radius:9px;cursor:pointer}
+  .librow:hover{border-color:var(--dusk)}
+  .librow.on{border-color:var(--dusk);background:var(--dusk-soft)}
+  .librow b{flex:1;font-weight:400;font-size:.9rem;color:var(--moon);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .librow i{font-style:normal;font-size:.75rem;color:var(--moon-dim)}
+  .librow button{background:none;border:0;color:var(--moon-dim);font-size:1.1rem;
+    line-height:1;padding:2px 5px;cursor:pointer;border-radius:5px;font-family:inherit}
+  .librow button:hover{color:#e0a3a3;background:rgba(224,163,163,.12)}
+  .libgrid{display:flex;gap:8px;flex-wrap:wrap}
+  .libthumb{position:relative;width:62px;height:62px;border-radius:9px;overflow:hidden;
+    border:2px solid transparent;cursor:pointer}
+  .libthumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .libthumb.on{border-color:var(--dusk)}
+  .libthumb .tick{position:absolute;top:3px;left:4px;font-size:.7rem;color:var(--ink);
+    background:var(--dusk);border-radius:999px;width:17px;height:17px;
+    display:none;align-items:center;justify-content:center;font-weight:700}
+  .libthumb.on .tick{display:flex}
+  .libthumb .del{position:absolute;bottom:0;right:0;background:rgba(10,13,22,.8);
+    color:var(--moon-dim);border:0;font-size:.85rem;line-height:1;padding:3px 5px;cursor:pointer}
+  .libthumb .del:hover{color:#e0a3a3}
+  .privacy{font-size:.78rem;color:var(--moon-dim);margin-top:10px;
+    padding-top:10px;border-top:1px solid var(--line)}
+
   /* ---------- stats ---------- */
   .statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:4px}
   .stat{background:var(--ink-3);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
@@ -176,7 +206,7 @@
   <header>
     <h1>STILL</h1>
     <p>Your files stay on this device — nothing is uploaded.</p>
-    <p style="font-size:.72rem;opacity:.45;margin-top:4px">v14</p>
+    <p style="font-size:.72rem;opacity:.45;margin-top:4px">v15</p>
   </header>
 
   <div class="card">
@@ -201,6 +231,11 @@
         <input type="number" id="pauseSec" min="0" step="any" value="3">
       </div>
     </div>
+    <label class="check"><input type="checkbox" id="saveAudio" checked> Save this sound on this device for next time</label>
+    <div class="lib" id="audioLib" style="display:none">
+      <h3>Saved sounds — tap to use</h3>
+      <div id="audioLibList"></div>
+    </div>
     <label class="check"><input type="checkbox" id="bgMode"> Keep playing when the screen locks</label>
     <p class="hint">Builds your whole session into one continuous track so the phone treats it like a song — playback continues with the screen off and you get lock-screen controls. Sessions with more than ~20 minutes of sound fall back to a repeating loop that stops when you wake the phone. Images still need the screen on.</p>
   </div>
@@ -212,6 +247,12 @@
     </div>
     <input type="file" id="imgInput" accept="image/*" multiple>
     <div class="thumbs" id="thumbs"></div>
+    <label class="check"><input type="checkbox" id="saveImgs" checked> Save these images on this device for next time</label>
+    <div class="lib" id="imgLib" style="display:none">
+      <h3>Saved images — tap to include</h3>
+      <div class="libgrid" id="imgLibGrid"></div>
+      <p class="hint" id="imgLibCount"></p>
+    </div>
 
     <!-- shown only in Images-only mode -->
     <div class="row" id="onlyOpts">
@@ -293,6 +334,7 @@
     </div>
     <input type="file" id="importInput" accept="application/json,.json">
     <div id="statMsg"></div>
+    <p class="privacy">Everything — your sounds, images and stats — is stored privately in this browser on this device. Nothing is ever uploaded, and no one else opening this web address can see any of it.</p>
   </div>
 
   <button id="beginBtn" disabled>Begin</button>
@@ -418,6 +460,14 @@ async function loadAudio(file){
     tmp.close();
     audioFileName=file.name;
     $('audioName').textContent=file.name+' — '+fmt(audioBuffer.duration);
+    if($('saveAudio').checked){
+      try{
+        const dup=(await dbAll()).find(r=>r.kind==='audio'&&r.name===file.name&&r.size===file.size);
+        if(!dup) await dbPut({id:newId(),kind:'audio',name:file.name,type:file.type,
+                              size:file.size,bytes:await file.arrayBuffer(),at:Date.now()});
+        refreshLibrary();
+      }catch(e){}
+    }
   }catch(err){
     audioBuffer=null;$('audioName').textContent='';
     $('err').textContent='That file could not be decoded. Try re-exporting it as a standard WAV or MP3.';
@@ -435,7 +485,21 @@ function loadImages(fileList){
   images=files.map(f=>URL.createObjectURL(f));
   const t=$('thumbs');t.innerHTML='';
   images.forEach(u=>{const im=new Image();im.src=u;im.alt='';t.appendChild(im);});
+  pickedImgIds=[];
   updateBegin();
+  if($('saveImgs').checked){
+    (async()=>{
+      try{
+        const have=await dbAll();
+        for(const f of files){
+          const dup=have.find(r=>r.kind==='image'&&r.name===f.name&&r.size===f.size);
+          if(!dup) await dbPut({id:newId(),kind:'image',name:f.name,type:f.type,
+                                size:f.size,bytes:await f.arrayBuffer(),at:Date.now()});
+        }
+        refreshLibrary();
+      }catch(e){}
+    })();
+  }
 }
 
 /* ---------- length mode ---------- */
@@ -844,6 +908,141 @@ function releaseWake(){if(wakeLock){wakeLock.release().catch(()=>{});wakeLock=nu
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible'&&S.running&&!wakeLock)requestWake();
 });
+
+
+/* ================= saved file library (private, on this device) ================= */
+const DB_NAME='still-files', DB_STORE='files';
+let dbp=null;
+function db(){
+  if(dbp) return dbp;
+  dbp=new Promise((res,rej)=>{
+    const r=indexedDB.open(DB_NAME,1);
+    r.onupgradeneeded=()=>{
+      const d=r.result;
+      if(!d.objectStoreNames.contains(DB_STORE)) d.createObjectStore(DB_STORE,{keyPath:'id'});
+    };
+    r.onsuccess=()=>res(r.result);
+    r.onerror=()=>rej(r.error);
+  });
+  return dbp;
+}
+async function dbPut(rec){
+  const d=await db();
+  return new Promise((res,rej)=>{
+    const t=d.transaction(DB_STORE,'readwrite');
+    t.objectStore(DB_STORE).put(rec);
+    t.oncomplete=()=>res(); t.onerror=()=>rej(t.error);
+  });
+}
+async function dbAll(){
+  const d=await db();
+  return new Promise((res,rej)=>{
+    const out=[];
+    const t=d.transaction(DB_STORE,'readonly');
+    const rq=t.objectStore(DB_STORE).openCursor();
+    rq.onsuccess=()=>{const c=rq.result;if(c){out.push(c.value);c.continue();}else res(out);};
+    rq.onerror=()=>rej(rq.error);
+  });
+}
+async function dbDel(id){
+  const d=await db();
+  return new Promise((res,rej)=>{
+    const t=d.transaction(DB_STORE,'readwrite');
+    t.objectStore(DB_STORE).delete(id);
+    t.oncomplete=()=>res(); t.onerror=()=>rej(t.error);
+  });
+}
+const newId=()=>Date.now()+'-'+Math.random().toString(36).slice(2,8);
+/* records hold raw bytes: reliable in every browser, unlike stored File objects */
+function recUrl(rec){
+  if(!rec.url) rec.url=URL.createObjectURL(new Blob([rec.bytes],{type:rec.type||''}));
+  return rec.url;
+}
+
+let savedAudio=[], savedImgs=[], pickedImgIds=[];
+
+async function refreshLibrary(){
+  let all=[];
+  try{ all=await dbAll(); }catch(e){ return; }               // private mode etc: skip silently
+  savedAudio=all.filter(r=>r.kind==='audio').sort((a,b)=>a.at-b.at);
+  savedImgs =all.filter(r=>r.kind==='image').sort((a,b)=>a.at-b.at);
+
+  // ---- sounds ----
+  const wrap=$('audioLib'), list=$('audioLibList');
+  wrap.style.display=savedAudio.length?'':'none';
+  list.innerHTML='';
+  savedAudio.forEach(rec=>{
+    const row=document.createElement('div');
+    row.className='librow'+(audioFileName===rec.name?' on':'');
+    const nm=document.createElement('b'); nm.textContent=rec.name;
+    const sz=document.createElement('i'); sz.textContent=Math.round(rec.size/1048576*10)/10+' MB';
+    const del=document.createElement('button');
+    del.type='button'; del.textContent='×'; del.title='Remove from this device';
+    del.addEventListener('click',async ev=>{ev.stopPropagation();await dbDel(rec.id);refreshLibrary();});
+    row.addEventListener('click',()=>useSavedAudio(rec));
+    row.appendChild(nm);row.appendChild(sz);row.appendChild(del);
+    list.appendChild(row);
+  });
+
+  // ---- images ----
+  const iwrap=$('imgLib'), grid=$('imgLibGrid');
+  iwrap.style.display=savedImgs.length?'':'none';
+  grid.innerHTML='';
+  savedImgs.forEach(rec=>{
+    const cell=document.createElement('div');
+    const pos=pickedImgIds.indexOf(rec.id);
+    cell.className='libthumb'+(pos>=0?' on':'');
+    const im=new Image(); im.src=recUrl(rec); im.alt='';
+    const tick=document.createElement('div'); tick.className='tick'; tick.textContent=pos>=0?pos+1:'';
+    const del=document.createElement('button');
+    del.type='button'; del.className='del'; del.textContent='×'; del.title='Remove from this device';
+    del.addEventListener('click',async ev=>{
+      ev.stopPropagation();
+      pickedImgIds=pickedImgIds.filter(x=>x!==rec.id);
+      await dbDel(rec.id); applyPickedImages(); refreshLibrary();
+    });
+    cell.addEventListener('click',()=>{
+      const i=pickedImgIds.indexOf(rec.id);
+      if(i>=0) pickedImgIds.splice(i,1); else pickedImgIds.push(rec.id);
+      applyPickedImages(); refreshLibrary();
+    });
+    cell.appendChild(im);cell.appendChild(tick);cell.appendChild(del);
+    grid.appendChild(cell);
+  });
+  $('imgLibCount').textContent = pickedImgIds.length
+    ? pickedImgIds.length+' selected — they play in the order you tapped them.'
+    : 'Tap thumbnails to build your sequence.';
+}
+
+async function useSavedAudio(rec){
+  $('err').textContent='';
+  $('audioName').textContent='Loading "'+rec.name+'"…';
+  try{
+    const tmp=new (window.AudioContext||window.webkitAudioContext)();
+    audioBuffer=await tmp.decodeAudioData(rec.bytes.slice(0));   // slice: decode detaches the buffer
+    tmp.close();
+    audioFileName=rec.name;
+    $('audioName').textContent=rec.name+' — '+fmt(audioBuffer.duration);
+  }catch(e){
+    $('err').textContent='That saved sound could not be loaded.';
+    $('audioName').textContent='';
+  }
+  updateBegin(); refreshLibrary();
+}
+
+/* selecting saved images replaces the current picture set */
+function applyPickedImages(){
+  if(!pickedImgIds.length){ return; }
+  images=pickedImgIds.map(id=>{
+    const r=savedImgs.find(x=>x.id===id);
+    return r ? recUrl(r) : null;
+  }).filter(Boolean);
+  const t=$('thumbs'); t.innerHTML='';
+  images.forEach(u=>{const im=new Image();im.src=u;im.alt='';t.appendChild(im);});
+  updateBegin();
+}
+
+refreshLibrary();
 
 /* ================= practice stats ================= */
 const STATS_KEY='still-stats';
